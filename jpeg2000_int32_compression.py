@@ -26,9 +26,10 @@ def compress_csv_to_jp2_pillow(csv_path, jp2_path, compression_ratio):
     print(f"데이터를 '{jp2_path}' 파일로 압축합니다. (압축 목표: 1/{compression_ratio})")
     image = Image.fromarray(normalized_data, mode='I;16')
     
-    target_bpp = 16 / compression_ratio
-    
-    image.save(jp2_path, 'JPEG2000', quality_mode='rates', quality_layers=[target_bpp])
+    # PSNR(dB) 기반으로 품질 제어. 높은 값일수록 오차가 적음.
+    target_psnr = 50  # 목표 PSNR 값을 50dB로 설정
+
+    image.save(jp2_path, 'JPEG2000', quality_mode='dB', quality_layers=[target_psnr])
     
     original_size = os.path.getsize(csv_path)
     compressed_size = os.path.getsize(jp2_path)
